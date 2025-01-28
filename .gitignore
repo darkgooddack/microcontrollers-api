@@ -5,7 +5,8 @@ __pycache__/
 modem_project/.env
 # C extensions
 *.so
-
+D:\microcontrollers-api\.env
+.env
 # Distribution / packaging
 .Python
 build/
