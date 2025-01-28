@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+modem_project/.env
 # C extensions
 *.so
 
@@ -128,7 +128,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+modem_project/.env
 .venv
 env/
 venv/
