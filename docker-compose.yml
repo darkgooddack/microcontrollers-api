@@ -1,0 +1,31 @@
+services:
+  web:
+    build:
+      context: ./modem_project  # Указываем контекст, где находится Dockerfile
+      dockerfile: Dockerfile     # Указываем путь к Dockerfile, если он не в корне контекста
+    volumes:
+      - ./modem_project:/app     # Монтируем папку с проектом в контейнер
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}  # Переменная из .env
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Переменная из .env
+      POSTGRES_DB: ${POSTGRES_DB}  # Переменная из .env
+
+volumes:
+  postgres_data:
+
+
+

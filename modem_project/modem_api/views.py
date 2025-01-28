@@ -23,7 +23,8 @@ class CreateModemData(APIView):
         data = request.data
 
         # Извлекаем или создаем объект Modem
-        modem = Modem.objects.get(mac_address=data["mac"])  # По MAC-адресу находим модем
+        modem, created = Modem.objects.get_or_create(mac_address=data["mac"])
+
 
         # Создаем датчики для данного модема
         for i in range(1, 3):

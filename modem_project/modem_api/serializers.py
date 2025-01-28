@@ -9,7 +9,7 @@ class SensorSerializer(serializers.ModelSerializer):
 class CounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Counter
-        fields = 'all'
+        fields = '__all__'
 
 class ModemSerializer(serializers.ModelSerializer):
     sensors = SensorSerializer(many=True)
