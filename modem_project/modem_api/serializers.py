@@ -2,9 +2,11 @@ from rest_framework import serializers
 from .models import Modem, Sensor, Counter
 
 class SensorSerializer(serializers.ModelSerializer):
+    modem_mac_address = serializers.CharField(source='modem.mac_address', read_only=True)
+
     class Meta:
         model = Sensor
-        fields = ['mac_address', 'vibrations', 'temperature']
+        fields = ['mac_address', 'vibrations', 'temperature', 'modem_mac_address']
 
 class CounterSerializer(serializers.ModelSerializer):
     class Meta:

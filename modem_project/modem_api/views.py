@@ -32,21 +32,37 @@ class CreateModemData(APIView):
             vibrations = data.get(f"vibrations{i}")
             temperature = data.get(f"temperature{i}")
 
-            # Создание датчиков
-            sensor = Sensor.objects.create(
-                modem=modem,  # Связываем с модемом
+            # Получаем последний элемент из списков вибрации и температуры
+            vibrations = vibrations[-1] if vibrations else None
+            temperature = temperature[-1] if temperature else None
+
+            # Проверяем или создаем датчик, обновляем данные, если он уже существует
+            sensor, created = Sensor.objects.update_or_create(
+                modem=modem,
                 mac_address=sensor_name,
-                vibrations=vibrations,
-                temperature=temperature
+                defaults={"vibrations": vibrations, "temperature": temperature}
             )
 
         # Создание счетчиков для данного модема
         for counter_data in data["counters"]:
             counter_data["modem"] = modem  # Устанавливаем модем для счетчика
             # Важно: добавляем поле 'time', которое требуется для создания счетчика
-            counter_data["time"] = data["time"]  # Передаем список времени
-            # Создаем счетчик
-            Counter.objects.create(**counter_data)
+            counter_data["time"] = data["time"][-1]  # Передаем последнее время
+
+            for field in ["energy", "cos_fi_a", "cos_fi_b", "cos_fi_c", "cos_fi_common",
+                          "freq_a", "freq_b", "freq_c", "freq_common", "voltage_a", "voltage_b",
+                          "voltage_c", "voltage_common", "current_a", "current_b", "current_c",
+                          "current_common", "whole_power_a", "whole_power_b", "whole_power_c",
+                          "active_power_a", "active_power_b", "active_power_c",
+                          "reactive_power_a", "reactive_power_b", "reactive_power_c"]:
+                if counter_data.get(field):
+                    counter_data[field] = counter_data[field][-1]
+
+            counter, created = Counter.objects.update_or_create(
+                modem=modem,
+                time=counter_data["time"],  # Уникальное поле для счетчика
+                defaults={k: v for k, v in counter_data.items() if k != "modem" and k != "time"}
+            )
 
         # Возвращаем успешный ответ
         return Response({"message": "Data successfully saved"}, status=status.HTTP_201_CREATED)
