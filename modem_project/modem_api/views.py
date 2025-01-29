@@ -22,32 +22,26 @@ class CreateModemData(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
 
-        # Извлекаем или создаем объект Modem
         modem, created = Modem.objects.get_or_create(mac_address=data["mac"])
 
 
-        # Создаем датчики для данного модема
         for i in range(1, 3):
             sensor_name = data.get(f"name{i}")
             vibrations = data.get(f"vibrations{i}")
             temperature = data.get(f"temperature{i}")
 
-            # Получаем последний элемент из списков вибрации и температуры
             vibrations = vibrations[-1] if vibrations else None
             temperature = temperature[-1] if temperature else None
 
-            # Проверяем или создаем датчик, обновляем данные, если он уже существует
             sensor, created = Sensor.objects.update_or_create(
                 modem=modem,
                 mac_address=sensor_name,
                 defaults={"vibrations": vibrations, "temperature": temperature}
             )
 
-        # Создание счетчиков для данного модема
         for counter_data in data["counters"]:
-            counter_data["modem"] = modem  # Устанавливаем модем для счетчика
-            # Важно: добавляем поле 'time', которое требуется для создания счетчика
-            counter_data["time"] = data["time"][-1]  # Передаем последнее время
+            counter_data["modem"] = modem
+            counter_data["time"] = data["time"][-1]
 
             for field in ["energy", "cos_fi_a", "cos_fi_b", "cos_fi_c", "cos_fi_common",
                           "freq_a", "freq_b", "freq_c", "freq_common", "voltage_a", "voltage_b",
@@ -60,9 +54,8 @@ class CreateModemData(APIView):
 
             counter, created = Counter.objects.update_or_create(
                 modem=modem,
-                time=counter_data["time"],  # Уникальное поле для счетчика
+                time=counter_data["time"],
                 defaults={k: v for k, v in counter_data.items() if k != "modem" and k != "time"}
             )
 
-        # Возвращаем успешный ответ
         return Response({"message": "Data successfully saved"}, status=status.HTTP_201_CREATED)

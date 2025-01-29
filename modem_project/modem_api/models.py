@@ -10,11 +10,11 @@ class Modem(models.Model):
 class Sensor(models.Model):
     modem = models.ForeignKey(Modem, related_name='sensors', on_delete=models.CASCADE)
     mac_address = models.CharField(max_length=17)
-    vibrations = models.JSONField()  # Данные вибрации
-    temperature = models.JSONField()  # Данные температуры
+    vibrations = models.JSONField()
+    temperature = models.JSONField()
 
     def str(self):
-        return f"Sensor: {self.mac_address} (Modem: {self.modem.mac_address})"  # Указывает MAC-адрес датчика и модема
+        return f"Sensor: {self.mac_address} (Modem: {self.modem.mac_address})"
 
 
 class Counter(models.Model):
