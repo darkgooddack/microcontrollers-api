@@ -1,17 +1,21 @@
 from rest_framework import serializers
 from .models import Modem, Sensor, Counter
 
+#Всё супер но id желательно возвращать
+
 class SensorSerializer(serializers.ModelSerializer):
     modem_mac_address = serializers.CharField(source='modem.mac_address', read_only=True)
 
     class Meta:
         model = Sensor
-        fields = ['mac_address', 'vibrations', 'temperature', 'modem_mac_address']
+        fields = ['id', 'mac_address', 'vibrations', 'temperature', 'modem_mac_address']
+
 
 class CounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Counter
         fields = '__all__'
+
 
 class ModemSerializer(serializers.ModelSerializer):
     sensors = SensorSerializer(many=True)
@@ -19,7 +23,8 @@ class ModemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Modem
-        fields = ['mac_address', 'sensors', 'counters']
+        fields = ['id', 'mac_address', 'sensors', 'counters']
+
 
 class PostDataSerializer(serializers.Serializer):
     mac = serializers.CharField(max_length=17)

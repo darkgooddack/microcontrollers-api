@@ -12,19 +12,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+ic*0+_&pcbzey1t+&fm286!y9r5q^ohw2!y0s@o2#3#7!2@)f'
+
+# ключ тоже необходимо прятать в env
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-+ic*0+_&pcbzey1t+&fm286!y9r5q^ohw2!y0s@o2#3#7!2@)f'),
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,12 +81,12 @@ WSGI_APPLICATION = 'modem_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'), #db#env('DB_HOST')
-        'PORT': env('DB_PORT'),
+        'ENGINE': os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        'NAME': os.environ.get('DB_NAME', BASE_DIR / "db.sqlite3"),
+        'USER': os.environ.get('DB_USER', "user"),
+        'PASSWORD': os.environ.get('DB_PASSWORD', "password"),
+        'HOST': os.environ.get('DB_HOST', "localhost"),
+        'PORT': os.environ.get('DB_PORT', "5432"),
     }
 }
 

@@ -1,17 +1,23 @@
+import datetime as dt
+
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import *
-from .serializers import *
+# импортировать рекомендуется явно
+from .models import Modem, Sensor, Counter
+from .serializers import ModemSerializer, SensorSerializer, CounterSerializer
+
 
 class ModemListView(generics.ListAPIView):
     queryset = Modem.objects.all()
     serializer_class = ModemSerializer
 
+
 class SensorListView(generics.ListAPIView):
     queryset = Sensor.objects.all()
     serializer_class = SensorSerializer
+
 
 class CounterListView(generics.ListAPIView):
     queryset = Counter.objects.all()
@@ -19,7 +25,7 @@ class CounterListView(generics.ListAPIView):
 
 
 class CreateModemData(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         data = request.data
 
         modem, created = Modem.objects.get_or_create(mac_address=data["mac"])
@@ -32,11 +38,13 @@ class CreateModemData(APIView):
 
             vibrations = vibrations[-1] if vibrations else None
             temperature = temperature[-1] if temperature else None
+            time_mark = data.get("time", [dt.datetime.now()])[-1]
 
-            sensor, created = Sensor.objects.update_or_create(
+            #убрал неиспользуемыу переменные
+            Sensor.objects.update_or_create(
                 modem=modem,
                 mac_address=sensor_name,
-                defaults={"vibrations": vibrations, "temperature": temperature}
+                defaults={"vibrations": vibrations, "temperature": temperature, "time": time_mark}
             )
 
         for counter_data in data["counters"]:
@@ -52,7 +60,8 @@ class CreateModemData(APIView):
                 if counter_data.get(field):
                     counter_data[field] = counter_data[field][-1]
 
-            counter, created = Counter.objects.update_or_create(
+            # убрал неиспользуемыу переменные
+            Counter.objects.update_or_create(
                 modem=modem,
                 time=counter_data["time"],
                 defaults={k: v for k, v in counter_data.items() if k != "modem" and k != "time"}

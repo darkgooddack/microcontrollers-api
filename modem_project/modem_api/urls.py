@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import *
+
+# импортировать рекомендуется явно
+from .views import ModemListView, SensorListView, CounterListView, CreateModemData
 
 urlpatterns = [
     path('modems/all', ModemListView.as_view()),

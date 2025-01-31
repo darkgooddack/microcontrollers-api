@@ -1,22 +1,33 @@
 services:
   web:
-    build:
-      context: ./modem_project  # Указываем контекст, где находится Dockerfile
-      dockerfile: Dockerfile     # Указываем путь к Dockerfile, если он не в корне контекста
+    container_name: api_test_task
+    build: ./modem_project
     volumes:
       - ./modem_project:/app     # Монтируем папку с проектом в контейнер
     ports:
       - "8000:8000"
+    depends_on:
+      - db
     environment:
       - DEBUG=True
-    command: >
+      - SQL_ENGINE=django.db.backends.postgresql
+      - DB_NAME=${POSTGRES_DB} # Переменная из .env
+      - DB_USER=${POSTGRES_USER} # Переменная из .env
+      - DB_PASSWORD=${POSTGRES_PASSWORD} # Переменная из .env
+      - DB_HOST=db
+      - DB_PORT=5432
+    command: > # Добавил создание миграций (для случия изминения БД)
       sh -c "
+      python manage.py makemigrations &&
       python manage.py migrate &&
       python manage.py runserver 0.0.0.0:8000
-      "
+      " 
 
   db:
     image: postgres:13
+    container_name: db_test_task
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -26,6 +37,3 @@ services:
 
 volumes:
   postgres_data:
-
-
-
