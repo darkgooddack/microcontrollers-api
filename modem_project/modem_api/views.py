@@ -38,7 +38,7 @@ class CreateModemData(APIView):
 
             vibrations = vibrations[-1] if vibrations else None
             temperature = temperature[-1] if temperature else None
-            time_mark = data.get("time", [dt.datetime.now()])[-1]
+            time_mark = dt.datetime.strptime(data.get("time")[-1], "%Y/%m/%d %H:%M:%S")
 
             #убрал неиспользуемыу переменные
             Sensor.objects.update_or_create(
@@ -63,7 +63,7 @@ class CreateModemData(APIView):
             # убрал неиспользуемыу переменные
             Counter.objects.update_or_create(
                 modem=modem,
-                time=counter_data["time"],
+                time=dt.datetime.strptime(counter_data["time"], "%Y/%m/%d %H:%M:%S"),
                 defaults={k: v for k, v in counter_data.items() if k != "modem" and k != "time"}
             )
 
