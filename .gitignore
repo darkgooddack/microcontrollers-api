@@ -170,3 +170,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+.idea/
+modem_project/modem_api/migrations/*
+!modem_project/modem_api/migrations/__init__.py
